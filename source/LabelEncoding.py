@@ -1,3 +1,6 @@
+# Rquired packages
+import random
+
 class Label_Encoding:
     '''
         before encoding you need to set up which columns you want to label encode.
@@ -9,6 +12,17 @@ class Label_Encoding:
         If you want to encode only train data, you can do with fit_tranform method.
         You can use the tranform method to encode the test data. It will autometically
         handle the categories which yet to encode.
+
+        Example
+        ["df", "df_test" are respectively the train and test dataframe you are using, "target_col" is the column to predict.
+        Note that these are used as example. None of them are defined here for simplicity.]
+
+        from LabelEncoding import Label_Encoding
+
+        le = Label_Encoding(custom_encoding="partial", random_state=42) # custom_encoding can be True, False, "partial". False by default.
+        le.fit(df, df.columns, {target_col: {'A': 1.0, 'B': 2.0}})
+        le.transform(df)
+        le.transform(df_test)
     '''
     def __init__(self, custom_encoding=False, random_state=None):
         self.custom_encoding = custom_encoding
@@ -18,6 +32,7 @@ class Label_Encoding:
         self.cols_to_encode = None
         self.extra_encode = {}
     
+    # Creates dictionary of encodes.
     def _create_dict(self, df, columns):
         d = {}
         for col in columns:
@@ -33,6 +48,7 @@ class Label_Encoding:
             d[col] = d_tmp
         return d
     
+    # Fits the data
     def fit(self, df, columns, encoding_dict=None):
         self.cols_to_encode = columns
         if not self.custom_encoding:
@@ -63,11 +79,13 @@ class Label_Encoding:
         for col in dct.keys():
             df[col] = df[col].map(dct[col])
 
+    # Fits the data and then transforms it with label encode
     def fit_transform(self, df, columns, encoding_dict=None):
         self.cols_to_encode = columns
         enc_d = self.fit(df, columns, encoding_dict)
         self._transform(df, enc_d)
 
+    # Transforms it with label encode
     def transform(self, df):
         enc_d = self.d
         self._transform(df, enc_d)
@@ -85,18 +103,8 @@ class Label_Encoding:
                 self.extra_encode[col] = re_dct
                 df[col] = df[col].map(re_dct)
     
+    # To check what variables got created during the process
     def info(self):
-        print('''
-        before encoding you need to set up which columns you want to label encode.
-        Note that, ideally you will use fit function create the encoding.
-        Otherwise if you want to use your custom made encoding you can do so.
-        The process to custom encode is that you need to create a nested dictionary.
-        The main dictonary will have keys as column names you want to encode, and as values,
-        you need to use a dictonary which will have keys as category and value as encoded values.
-        If you want to encode only train data, you can do with fit_tranform method.
-        You can use the tranform method to encode the test data. It will autometically
-        handle the categories which yet to encode.
-        ''')
         print("Encoded dictonary: {}".format(self.d))
         print("Random state of this run: {}".format(self.random_state))
         print("Extra encoding on transformed data: {}".format(self.extra_encode))
