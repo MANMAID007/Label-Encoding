@@ -2,7 +2,7 @@
 
 # Label-Encoding
 
-Label Encoding class is to label encode the data on requird columns of you choice
+Label Encoding class is to label encode the data on required columns of you choice
 
 ## Usage
 
